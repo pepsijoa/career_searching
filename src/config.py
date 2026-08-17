@@ -13,6 +13,7 @@ load_dotenv(SRC_DIR / ".env")
 
 # 설정 정보 (보안을 위해 환경변수 또는 .env에서만 주입)
 REST_API_KEY = os.getenv("KAKAO_REST_API_KEY", "")
+CLIENT_SECRET = os.getenv("KAKAO_CLIENT_SECRET", "")
 REFRESH_TOKEN = os.getenv("KAKAO_REFRESH_TOKEN", "")
 TOKEN_FILE = os.getenv("KAKAO_TOKEN_FILE", str(SRC_DIR / "kakao_tokens.json"))
 DB_FILE = os.getenv("JOB_DB_FILE", str(SRC_DIR / "jobs.db"))

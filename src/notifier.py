@@ -4,7 +4,7 @@ import json
 import requests
 import logging
 from datetime import datetime
-from config import REST_API_KEY, REFRESH_TOKEN, TOKEN_FILE, GITHUB_PAGES_URL
+from config import REST_API_KEY, CLIENT_SECRET, REFRESH_TOKEN, TOKEN_FILE, GITHUB_PAGES_URL
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,8 @@ def update_kakao_access_token() -> str | None:
             "client_id": REST_API_KEY,
             "refresh_token": refresh_token
         }
+        if CLIENT_SECRET:
+            data["client_secret"] = CLIENT_SECRET
         response = requests.post(url, data=data, timeout=10)
         new_tokens = response.json()
 
@@ -86,18 +88,19 @@ def format_deadline_label(deadline_str: str | None) -> str:
     except Exception:
         return "~" + deadline_str[:10]
 
-def build_kakao_message_text(job_list: list[dict], max_length: int = 820) -> str:
+def build_kakao_message_text(job_list: list[dict], max_length: int = 800) -> str:
     """
     단일 카카오톡 메시지 본문 생성 (최대 글자 수 안전 제한 준수)
     1. 하이라이트/대기업 공고 (상세 링크 포함)
     2. 일반 추천 공고 (간결 요약)
-    3. 초과 시 '...외 N건' 요약 + 웹 대시보드 안내
+    3. 초과 시 '...외 N건' 요약 + 웹 대시보드 링크 직접 노출
     """
     total_count = len(job_list)
     today_str = datetime.now().strftime("%m/%d")
     
     header = f"📢 [임베디드/시스템 채용 알림 ({today_str})]\n오늘의 맞춤 공고: 총 {total_count}건\n"
-    footer_guide = "\n\n👉 전체 공고 및 상세 필터는 아래 버튼을 클릭하세요!"
+    dashboard_url = GITHUB_PAGES_URL.rstrip('/')
+    footer_guide = f"\n\n👉 [전체 공고 {total_count}건 웹 대시보드]\n🔗 {dashboard_url}"
     
     highlighted_jobs = [j for j in job_list if j.get("is_highlighted")]
     standard_jobs = [j for j in job_list if not j.get("is_highlighted")]
