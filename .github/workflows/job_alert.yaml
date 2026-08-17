@@ -1,0 +1,39 @@
+name: Daily Embedded Job Alert
+
+on:
+  schedule:
+    # 매일 한국 시간 기준 오후 6시 (UTC 09:00) 단 1회 실행
+    - cron: '0 9 * * *'
+  workflow_dispatch: # GitHub 웹 화면에서 수동 실행 버튼 제공
+
+jobs:
+  run-crawler:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 저장소 체크아웃
+        uses: actions/checkout@v3
+
+      - name: Python 3.10 설치
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 의존성 패키지 설치
+        run: |
+          pip install requests python-dotenv beautifulsoup4
+
+      - name: 채용 공고 크롤러 및 웹 대시보드 생성 실행
+        env:
+          KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          KAKAO_REFRESH_TOKEN: ${{ secrets.KAKAO_REFRESH_TOKEN }}
+        run: |
+          python src/main.py
+
+      - name: GitHub Pages 웹 대시보드 커밋 및 푸시
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add index.html docs/index.html
+          git commit -m "Auto-update Job Radar Web Dashboard" || echo "No changes to commit"
+          git push

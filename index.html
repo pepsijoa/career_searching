@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>임베디드 & 시스템 SW 채용 대시보드 | Embedded Job Radar</title>
+    <meta name="description" content="원티드, 잡코리아, 자소설닷컴에서 엄선한 임베디드, 펌웨어, 시스템 소프트웨어 채용 공고를 실시간으로 확인하세요.">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-subtle: #f1f5f9;
+            --border-color: #e2e8f0;
+            --border-hover: #cbd5e1;
+            
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-subtle: #64748b;
+            
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            
+            --amber: #d97706;
+            --amber-light: #fef3c7;
+            --emerald: #059669;
+            --emerald-light: #ecfdf5;
+            --rose: #e11d48;
+            --rose-light: #ffe4e6;
+            
+            --wanted-color: #3b82f6;
+            --jobkorea-color: #f97316;
+            --jasoseol-color: #8b5cf6;
+            
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-full: 9999px;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+            
+            --font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        header {
+            background-color: #0f172a;
+            color: #ffffff;
+            padding: 28px 20px 24px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .header-container {
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            margin-bottom: 12px;
+        }
+
+        .header-badge .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-desc {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        /* Stat Grid */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .stat-card .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .stat-card.highlight .value {
+            color: #fbbf24;
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1080px;
+            margin: -12px auto 0;
+            padding: 0 16px;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            font-size: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--bg-subtle);
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            background-color: var(--bg-surface);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-subtle);
+            pointer-events: none;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .tabs-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tab-btn {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--border-hover);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: #0f172a;
+            border-color: #0f172a;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .select-sort {
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background-color: var(--bg-surface);
+            color: var(--text-main);
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Quick keyword tag chips */
+        .quick-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .quick-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-subtle);
+            margin-right: 4px;
+        }
+
+        .keyword-chip {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .keyword-chip:hover, .keyword-chip.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Job Count & Status */
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding: 0 4px;
+        }
+
+        .list-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .list-count span {
+            color: var(--primary);
+        }
+
+        /* Job Cards Grid */
+        .job-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .job-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            position: relative;
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--border-hover);
+        }
+
+        .job-card.is-highlight {
+            border-color: #fde68a;
+            background: linear-gradient(180deg, #fffdfa 0%, #ffffff 100%);
+        }
+
+        .job-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .company-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .company-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.01em;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: var(--radius-sm);
+            display: inline-flex;
+            align-items: center;
+            line-height: 1.3;
+        }
+
+        .badge-highlight {
+            background-color: var(--amber-light);
+            color: var(--amber);
+            border: 1px solid #fcd34d;
+        }
+
+        .badge-type-1 {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .badge-type-2 {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-platform {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+        }
+
+        .platform-wanted {
+            background: #eff6ff;
+            color: var(--wanted-color);
+            border: 1px solid #bfdbfe;
+        }
+
+        .platform-jobkorea {
+            background: #fff7ed;
+            color: var(--jobkorea-color);
+            border: 1px solid #fed7aa;
+        }
+
+        .platform-jasoseol {
+            background: #f5f3ff;
+            color: var(--jasoseol-color);
+            border: 1px solid #ddd6fe;
+        }
+
+        .job-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+
+        .job-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .detail-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-icon {
+            font-size: 13px;
+            width: 16px;
+            text-align: center;
+            color: var(--text-subtle);
+        }
+
+        .deadline-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+        }
+
+        .deadline-urgent {
+            background-color: var(--rose-light);
+            color: var(--rose);
+        }
+
+        .deadline-warning {
+            background-color: var(--amber-light);
+            color: var(--amber);
+        }
+
+        .deadline-normal {
+            background-color: var(--bg-subtle);
+            color: var(--text-muted);
+        }
+
+        .fit-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: var(--radius-full);
+        }
+
+        .fit-high {
+            background-color: var(--emerald-light);
+            color: var(--emerald);
+        }
+
+        .fit-med {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .fit-low {
+            background-color: var(--bg-subtle);
+            color: var(--text-subtle);
+        }
+
+        /* Duty tags */
+        .duty-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .duty-chip {
+            font-size: 11px;
+            background: var(--bg-subtle);
+            color: var(--text-muted);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Card Bottom */
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-link {
+            flex: 1;
+            text-align: center;
+            background: #0f172a;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 9px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            transition: background 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .btn-link:hover {
+            background: #1e293b;
+        }
+
+        .btn-bookmark {
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+            color: var(--text-subtle);
+            padding: 9px 12px;
+            font-size: 14px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-bookmark:hover {
+            background: var(--bg-primary);
+            color: var(--amber);
+        }
+
+        .btn-bookmark.bookmarked {
+            background: var(--amber-light);
+            border-color: #fcd34d;
+            color: var(--amber);
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-surface);
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            color: var(--text-subtle);
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        /* Floating Top Button */
+        .btn-top {
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-top.visible {
+            display: flex;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            header {
+                padding: 20px 16px 20px;
+            }
+            .header-title {
+                font-size: 20px;
+            }
+            .stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .job-grid {
+                grid-template-columns: 1fr;
+            }
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .tabs-group {
+                overflow-x: auto;
+                padding-bottom: 4px;
+                flex-wrap: nowrap;
+            }
+            .select-sort {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>2026년 08월 17일 23:19 실시간 동기화</span>
+            </div>
+            <h1 class="header-title">
+                <span>🛰️</span> 임베디드 & 시스템 SW 채용 레이더
+            </h1>
+            <p class="header-desc">
+                원티드 · 잡코리아 · 자소설닷컴의 임베디드, 펌웨어, 시스템 엔지니어 공고 통합 수집 대시보드
+            </p>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="label">총 추천 공고</div>
+                    <div class="value" id="stat-total">71건</div>
+                </div>
+                <div class="stat-card highlight">
+                    <div class="label">⭐ 주요/대기업</div>
+                    <div class="value" id="stat-highlight">2건</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">원티드</div>
+                    <div class="value">14건</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">잡코리아</div>
+                    <div class="value">55건</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">자소설닷컴</div>
+                    <div class="value">2건</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main>
+        <!-- Filter Panel -->
+        <section class="filter-panel" aria-label="채용 공고 검색 및 필터">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="기업명, 직무명, 기술 키워드 검색 (예: 현대, RTOS, BSP, STM32)" autocomplete="off">
+            </div>
+
+            <div class="filter-row">
+                <div class="tabs-group" id="platformTabs" role="tablist">
+                    <button class="tab-btn active" data-platform="all">전체 (71)</button>
+                    <button class="tab-btn" data-platform="highlight">⭐ 대기업/주요 (2)</button>
+                    <button class="tab-btn" data-platform="원티드">원티드 (14)</button>
+                    <button class="tab-btn" data-platform="잡코리아">잡코리아 (55)</button>
+                    <button class="tab-btn" data-platform="자소설닷컴">자소설닷컴 (2)</button>
+                    <button class="tab-btn" data-platform="bookmarked">⭐ 관심 공고 (<span id="bookmarkCount">0</span>)</button>
+                </div>
+
+                <select id="sortSelect" class="select-sort" aria-label="공고 정렬 기준">
+                    <option value="recommend">추천순 (하이라이트 > 대기업 > 적합도)</option>
+                    <option value="deadline">마감 임박순 (D-Day)</option>
+                    <option value="fit">직무 적합도 점수순</option>
+                    <option value="latest">최신 등록순</option>
+                </select>
+            </div>
+
+            <div class="quick-keywords">
+                <span class="quick-label">빠른 필터:</span>
+                <button class="keyword-chip" data-keyword="대기업">#대기업</button>
+                <button class="keyword-chip" data-keyword="RTOS">#RTOS</button>
+                <button class="keyword-chip" data-keyword="BSP">#BSP</button>
+                <button class="keyword-chip" data-keyword="펌웨어">#펌웨어</button>
+                <button class="keyword-chip" data-keyword="MCU">#MCU</button>
+                <button class="keyword-chip" data-keyword="C++">#C++</button>
+                <button class="keyword-chip" data-keyword="Linux">#Linux커널</button>
+                <button class="keyword-chip" data-keyword="AUTOSAR">#전장/AUTOSAR</button>
+            </div>
+        </section>
+
+        <!-- List Header -->
+        <div class="list-header">
+            <div class="list-count" id="displayedCount">
+                검색 결과: <span id="matchCount">71</span>건
+            </div>
+        </div>
+
+        <!-- Job Cards Grid -->
+        <div class="job-grid" id="jobGrid">
+            <!-- 자바스크립트에 의해 동적으로 렌더링됩니다 -->
+        </div>
+    </main>
+
+    <button class="btn-top" id="btnTop" aria-label="맨 위로 이동">↑</button>
+
+    <!-- Embedded Data & Interactive App Logic -->
+    <script>
+        const rawJobs = [{"id": "jobkorea_49724096", "platform": "잡코리아", "title": "Robot Embedded System Firmware Engineer", "company": "네이버랩스", "duty": "경기 성남시 / 솔루션·SI·CRM·ERP, 소프트웨어개발자", "deadline": null, "salary": "신입 지원 가능", "company_type": "대기업", "company_type_code": 1, "fit_score": 12, "fit_level": "High", "is_highlighted": true, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49724096", "extra": {"gino": "49724096", "matched_keyword": "임베디드", "badge": "신입 지원 가능", "chips": ["경기 성남시", "솔루션·SI·CRM·ERP, 소프트웨어개발자"]}}, {"id": "jobkorea_49627453", "platform": "잡코리아", "title": "[삼성 계열사 씨브이네트] 임베디드 시스템(OS) 개발자 (계약직)", "company": "㈜씨브이네트", "duty": "서울 송파구 / 네트워크·통신서비스, 앱개발자, 소프트웨어개발자", "deadline": null, "salary": "믿고보는 대기업", "company_type": "대기업", "company_type_code": 1, "fit_score": 4, "fit_level": "Med", "is_highlighted": true, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49627453", "extra": {"gino": "49627453", "matched_keyword": "임베디드", "badge": "믿고보는 대기업", "chips": ["서울 송파구", "네트워크·통신서비스, 앱개발자, 소프트웨어개발자"]}}, {"id": "jobkorea_49690905", "platform": "잡코리아", "title": "어드밴텍케이알(주) Linux BSP & Device Driver Engineer 채용", "company": "어드밴텍케이알㈜", "duty": "서울 강서구 / 컴퓨터·하드웨어·장비, 시스템엔지니어, 하드웨어개발자, R&D·연구원", "deadline": null, "salary": "탄탄한 중견기업", "company_type": "중견기업", "company_type_code": 2, "fit_score": 15, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49690905", "extra": {"gino": "49690905", "matched_keyword": "임베디드 리눅스", "badge": "탄탄한 중견기업", "chips": ["서울 강서구", "컴퓨터·하드웨어·장비, 시스템엔지니어, 하드웨어개발자, R&D·연구원"]}}, {"id": "jobkorea_49662665", "platform": "잡코리아", "title": "[슈프리마] Embedded Linux BSP 개발 모집", "company": "㈜슈프리마", "duty": "경기 성남시 / 전기·전자·제어, 앱개발자, 시스템엔지니어", "deadline": null, "salary": "경력5년↑", "company_type": "중견기업", "company_type_code": 2, "fit_score": 12, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49662665", "extra": {"gino": "49662665", "matched_keyword": "임베디드", "badge": "", "chips": ["경기 성남시", "전기·전자·제어, 앱개발자, 시스템엔지니어"]}}, {"id": "jobkorea_49428152", "platform": "잡코리아", "title": "[판교 사옥] Embedded Security BSP Engineer", "company": "(주)텔레칩스", "duty": "경기 성남시 / 기계·기계설비, 소프트웨어개발자", "deadline": null, "salary": "경력", "company_type": "중견기업", "company_type_code": 2, "fit_score": 11, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49428152", "extra": {"gino": "49428152", "matched_keyword": "임베디드", "badge": "", "chips": ["경기 성남시", "기계·기계설비, 소프트웨어개발자"]}}, {"id": "wanted_380612", "platform": "원티드", "title": "Server BMC Firmware Engineer", "company": "리벨리온", "duty": "임베디드/C++ 개발", "deadline": null, "salary": "경력 3~15년", "company_type": "중견기업", "company_type_code": 2, "fit_score": 10, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380612", "extra": {"reward": "100만원", "industry": "제조", "career": "경력 3~15년", "status": "active"}}, {"id": "jobkorea_49400086", "platform": "잡코리아", "title": "[다산네트웍스] 전장사업부 Embedded SW 엔지니어 채용", "company": "㈜다산네트웍스", "duty": "경기 성남시 / 네트워크·통신서비스, 소프트웨어개발자, 전기·전자엔지니어", "deadline": null, "salary": "탄탄한 중견기업", "company_type": "중견기업", "company_type_code": 2, "fit_score": 10, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49400086", "extra": {"gino": "49400086", "matched_keyword": "임베디드", "badge": "탄탄한 중견기업", "chips": ["경기 성남시", "네트워크·통신서비스, 소프트웨어개발자, 전기·전자엔지니어"]}}, {"id": "jobkorea_49428335", "platform": "잡코리아", "title": "[판교 사옥] BSP/SoC Platform Project Manager (PM)", "company": "(주)텔레칩스", "duty": "경기 성남시 / 기계·기계설비, PL·PM·PO, 하드웨어개발자", "deadline": null, "salary": "경력", "company_type": "중견기업", "company_type_code": 2, "fit_score": 10, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49428335", "extra": {"gino": "49428335", "matched_keyword": "임베디드 리눅스", "badge": "", "chips": ["경기 성남시", "기계·기계설비, PL·PM·PO, 하드웨어개발자"]}}, {"id": "wanted_380238", "platform": "원티드", "title": "[AI반도체] SoC Architect", "company": "모빌린트", "duty": "임베디드/C++ 개발", "deadline": "2026-09-30 23:59:59", "salary": "경력 1~5년", "company_type": "중견기업", "company_type_code": 2, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380238", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 1~5년", "status": "active"}}, {"id": "wanted_380230", "platform": "원티드", "title": "[AI반도체] SoC Design Engineer", "company": "모빌린트", "duty": "임베디드/C++ 개발", "deadline": "2026-09-30 23:59:59", "salary": "경력 0~1년", "company_type": "중견기업", "company_type_code": 2, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380230", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 0~1년", "status": "active"}}, {"id": "wanted_380224", "platform": "원티드", "title": "[AI반도체] ARM Architecture Engineer", "company": "모빌린트", "duty": "임베디드/C++ 개발", "deadline": "2026-09-30 23:59:59", "salary": "경력 5~10년", "company_type": "중견기업", "company_type_code": 2, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380224", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 5~10년", "status": "active"}}, {"id": "jobkorea_49428186", "platform": "잡코리아", "title": "[판교 사옥] Embedded S/W Engineer", "company": "(주)텔레칩스", "duty": "경기 성남시 / 기계·기계설비, 웹개발자, 앱개발자, 소프트웨어개발자", "deadline": null, "salary": "경력", "company_type": "중견기업", "company_type_code": 2, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49428186", "extra": {"gino": "49428186", "matched_keyword": "임베디드", "badge": "", "chips": ["경기 성남시", "기계·기계설비, 웹개발자, 앱개발자, 소프트웨어개발자"]}}, {"id": "jobkorea_49715981", "platform": "잡코리아", "title": "(주)세스코 임베디드 시스템 펌웨어 개발 담당자 채용", "company": "㈜세스코", "duty": "서울 강동구 / 제약·보건·바이오, 시스템엔지니어, 하드웨어엔지니어, R&D·연구원", "deadline": null, "salary": "탄탄한 중견기업", "company_type": "중견기업", "company_type_code": 2, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49715981", "extra": {"gino": "49715981", "matched_keyword": "임베디드", "badge": "탄탄한 중견기업", "chips": ["서울 강동구", "제약·보건·바이오, 시스템엔지니어, 하드웨어엔지니어, R&D·연구원"]}}, {"id": "wanted_380221", "platform": "원티드", "title": "[AI반도체] Linux System Engineer", "company": "모빌린트", "duty": "임베디드/C++ 개발", "deadline": "2026-09-30 23:59:59", "salary": "경력 3~10년", "company_type": "중견기업", "company_type_code": 2, "fit_score": 7, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380221", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 3~10년", "status": "active"}}, {"id": "wanted_380927", "platform": "원티드", "title": "[중견 계열사] Windows Application 개발자 (C/C++)", "company": "우리엔", "duty": "임베디드/C++ 개발", "deadline": "2026-08-28 23:59:59", "salary": "경력 7~100년", "company_type": "중견기업", "company_type_code": 2, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380927", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 7~100년", "status": "active"}}, {"id": "wanted_380014", "platform": "원티드", "title": "[중견 계열사] 의료영상 3D 어플리케이션 개발자 (C++/C#)", "company": "우리엔", "duty": "임베디드/C++ 개발", "deadline": "2026-08-28 23:59:59", "salary": "경력 4~100년", "company_type": "중견기업", "company_type_code": 2, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380014", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 4~100년", "status": "active"}}, {"id": "wanted_379193", "platform": "원티드", "title": "AI 카메라 임베디드 웹서버 개발자", "company": "슈프리마", "duty": "임베디드/C++ 개발", "deadline": "2026-09-30 23:59:59", "salary": "경력 3~7년", "company_type": "중견기업", "company_type_code": 2, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/379193", "extra": {"reward": "100만원", "industry": "제조", "career": "경력 3~7년", "status": "active"}}, {"id": "jobkorea_49662434", "platform": "잡코리아", "title": "(주)디알젬 연구소 펌웨어 경력사원 모집", "company": "㈜디알젬", "duty": "경기 광명시 외 5 / 제약·보건·바이오, 전기·전자엔지니어, R&D·연구원", "deadline": null, "salary": "탄탄한 중견기업", "company_type": "중견기업", "company_type_code": 2, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49662434", "extra": {"gino": "49662434", "matched_keyword": "펌웨어", "badge": "탄탄한 중견기업", "chips": ["경기 광명시 외 5", "제약·보건·바이오, 전기·전자엔지니어, R&D·연구원"]}}, {"id": "jobkorea_49746765", "platform": "잡코리아", "title": "MCU 반도체 디지털 설계 (경력)", "company": "어보브반도체㈜", "duty": "서울 강남구 / 반도체·디스플레이·광학, 설계엔지니어", "deadline": null, "salary": "합격축하금 50만원", "company_type": "중견기업", "company_type_code": 2, "fit_score": 3, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49746765", "extra": {"gino": "49746765", "matched_keyword": "MCU", "badge": "합격축하금 50만원", "chips": ["서울 강남구", "반도체·디스플레이·광학, 설계엔지니어"]}}, {"id": "jobkorea_49676958", "platform": "잡코리아", "title": "Automotive MCU Engineer경력", "company": "어보브반도체㈜", "duty": "서울 강남구 / 반도체·디스플레이·광학, 설계엔지니어", "deadline": null, "salary": "합격축하금 50만원", "company_type": "중견기업", "company_type_code": 2, "fit_score": 3, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49676958", "extra": {"gino": "49676958", "matched_keyword": "MCU", "badge": "합격축하금 50만원", "chips": ["서울 강남구", "반도체·디스플레이·광학, 설계엔지니어"]}}, {"id": "jobkorea_49720718", "platform": "잡코리아", "title": "임베디드 Linux BSP·펌웨어 개발자 경력 채용", "company": "칸트", "duty": "경기 안양시 / 전기·전자·제어, 소프트웨어개발자 / 연봉 3,000~8,000만원", "deadline": null, "salary": "경력3년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 13, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49720718", "extra": {"gino": "49720718", "matched_keyword": "임베디드 리눅스", "badge": "", "chips": ["경기 안양시", "전기·전자·제어, 소프트웨어개발자", "연봉 3,000~8,000만원"]}}, {"id": "jobkorea_49758990", "platform": "잡코리아", "title": "2026 (주)유니온바이오메트릭스 Embedded Linux BSP 개발자 모집", "company": "㈜유니온바이오메트릭스", "duty": "서울 송파구 / 전기·전자·제어, 시스템엔지니어, 소프트웨어개발자, AI/ML엔지니어", "deadline": null, "salary": "든든한 육아 지원금", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 12, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49758990", "extra": {"gino": "49758990", "matched_keyword": "임베디드", "badge": "든든한 육아 지원금", "chips": ["서울 송파구", "전기·전자·제어, 시스템엔지니어, 소프트웨어개발자, AI/ML엔지니어"]}}, {"id": "wanted_380164", "platform": "원티드", "title": "[대구] 임베디드 Embedded C/C++ IT SW 개발자 (2년이상)", "company": "파더스랩", "duty": "임베디드/C++ 개발", "deadline": "2026-08-31 23:59:59", "salary": "경력 2~12년", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 10, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380164", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 2~12년", "status": "active"}}, {"id": "jobkorea_49767834", "platform": "잡코리아", "title": "[대구] 임베디드 Embedded C++ 개발", "company": "㈜파더스랩", "duty": "대구 동구 외 2 / 전기·전자·제어, 앱개발자", "deadline": null, "salary": "합격축하금 100만원", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 10, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49767834", "extra": {"gino": "49767834", "matched_keyword": "임베디드", "badge": "합격축하금 100만원", "chips": ["대구 동구 외 2", "전기·전자·제어, 앱개발자"]}}, {"id": "jobkorea_49666175", "platform": "잡코리아", "title": "[Thundersoft Korea] Embedded Software Engineer (MCU/RTOS)", "company": "㈜썬더소프트코리아", "duty": "경기 성남시 외 2 / 솔루션·SI·CRM·ERP, 프론트엔드개발자, 소프트웨어개발자, 전기·전자엔지니어", "deadline": null, "salary": "경력5년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 10, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49666175", "extra": {"gino": "49666175", "matched_keyword": "RTOS", "badge": "", "chips": ["경기 성남시 외 2", "솔루션·SI·CRM·ERP, 프론트엔드개발자, 소프트웨어개발자, 전기·전자엔지니어"]}}, {"id": "jobkorea_49735214", "platform": "잡코리아", "title": "[시에리텍] Embedded Linux 개발자 경력직 채용", "company": "㈜시에리텍", "duty": "서울 강서구 / 컴퓨터·하드웨어·장비, 시스템엔지니어", "deadline": null, "salary": "경력2년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 10, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49735214", "extra": {"gino": "49735214", "matched_keyword": "임베디드 리눅스", "badge": "", "chips": ["서울 강서구", "컴퓨터·하드웨어·장비, 시스템엔지니어"]}}, {"id": "jobkorea_49681683", "platform": "잡코리아", "title": "임베디드 리눅스/펌웨어 개발", "company": "㈜에스티선랩", "duty": "서울 금천구 / 네트워크·통신서비스, 시스템엔지니어, 네트워크엔지니어, 소프트웨어개발자 / 연봉 3,000만원~", "deadline": null, "salary": "신입 지원 가능", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 9, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49681683", "extra": {"gino": "49681683", "matched_keyword": "임베디드 리눅스", "badge": "신입 지원 가능", "chips": ["서울 금천구", "네트워크·통신서비스, 시스템엔지니어, 네트워크엔지니어, 소프트웨어개발자", "연봉 3,000만원~"]}}, {"id": "jobkorea_49478677", "platform": "잡코리아", "title": "임베디드 리눅스 펌웨어 개발자 모집", "company": "㈜케이티앤씨", "duty": "서울 강서구 / 전기·전자·제어, 시스템엔지니어", "deadline": null, "salary": "경력무관", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 9, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49478677", "extra": {"gino": "49478677", "matched_keyword": "임베디드 리눅스", "badge": "", "chips": ["서울 강서구", "전기·전자·제어, 시스템엔지니어"]}}, {"id": "wanted_380335", "platform": "원티드", "title": "이리온 전장 및 PCB 설계 엔지니어 (서울)", "company": "폴라리스쓰리디(Polaris3D)", "duty": "임베디드/C++ 개발", "deadline": null, "salary": "경력 3~8년", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380335", "extra": {"reward": "100만원", "industry": "제조", "career": "경력 3~8년", "status": "active"}}, {"id": "jobkorea_49789764", "platform": "잡코리아", "title": "Embedded System Engineer (임베디드 시스템 엔지니어)", "company": "㈜앤서레이", "duty": "경기 안양시 / 전기·전자·제어, 전기·전자엔지니어, R&D·연구원 / 연봉 3,000만원~", "deadline": null, "salary": "경력무관", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49789764", "extra": {"gino": "49789764", "matched_keyword": "임베디드", "badge": "", "chips": ["경기 안양시", "전기·전자·제어, 전기·전자엔지니어, R&D·연구원", "연봉 3,000만원~"]}}, {"id": "jobkorea_49738872", "platform": "잡코리아", "title": "[하반기] 임베디드 펌웨어 개발자 다수 채용", "company": "㈜세나테크놀로지", "duty": "서울 강남구 / 네트워크·통신서비스, 전기·전자엔지니어, 하드웨어엔지니어, 통신엔지니어", "deadline": null, "salary": "경력2년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49738872", "extra": {"gino": "49738872", "matched_keyword": "임베디드", "badge": "", "chips": ["서울 강남구", "네트워크·통신서비스, 전기·전자엔지니어, 하드웨어엔지니어, 통신엔지니어"]}}, {"id": "jobkorea_49432179", "platform": "잡코리아", "title": "펌웨어/임베디드 펌웨어 개발자 모집", "company": "㈜신성테크", "duty": "전남광주 광산구 / 제약·보건·바이오, 하드웨어개발자 / 연봉 ~3,800만원", "deadline": null, "salary": "경력3년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49432179", "extra": {"gino": "49432179", "matched_keyword": "펌웨어", "badge": "", "chips": ["전남광주 광산구", "제약·보건·바이오, 하드웨어개발자", "연봉 ~3,800만원"]}}, {"id": "jobkorea_49442070", "platform": "잡코리아", "title": "펌웨어(Firmware)개발자 모집합니다.", "company": "㈜우심시스템", "duty": "경기 광명시 / 전기·전자·제어, 전기·전자엔지니어", "deadline": null, "salary": "경력3년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49442070", "extra": {"gino": "49442070", "matched_keyword": "펌웨어", "badge": "", "chips": ["경기 광명시", "전기·전자·제어, 전기·전자엔지니어"]}}, {"id": "jobkorea_49641574", "platform": "잡코리아", "title": "(Netis Systmes Co., Ltd) 펌웨어 개발자(임베디드 펌웨어 개발)", "company": "㈜넷유", "duty": "인천 영종구 / 네트워크·통신서비스, 시스템엔지니어, 소프트웨어개발자, 하드웨어개발자 / 연봉 4,000만원~", "deadline": null, "salary": "경력무관", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49641574", "extra": {"gino": "49641574", "matched_keyword": "펌웨어", "badge": "", "chips": ["인천 영종구", "네트워크·통신서비스, 시스템엔지니어, 소프트웨어개발자, 하드웨어개발자", "연봉 4,000만원~"]}}, {"id": "jobkorea_49789779", "platform": "잡코리아", "title": "[대화기기(주)] 의료기기 펌웨어(Firmware) 개발자 채용", "company": "대화기기㈜", "duty": "서울 강남구 / 제약·보건·바이오, 전기·전자엔지니어", "deadline": null, "salary": "경력무관", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49789779", "extra": {"gino": "49789779", "matched_keyword": "펌웨어", "badge": "", "chips": ["서울 강남구", "제약·보건·바이오, 전기·전자엔지니어"]}}, {"id": "jobkorea_49747664", "platform": "잡코리아", "title": "펌웨어(Firmware) 개발 직원 모집", "company": "㈜에스씨에스", "duty": "세종 / 기계·기계설비, 시스템엔지니어", "deadline": null, "salary": "경력5년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49747664", "extra": {"gino": "49747664", "matched_keyword": "펌웨어", "badge": "", "chips": ["세종", "기계·기계설비, 시스템엔지니어"]}}, {"id": "jobkorea_49749374", "platform": "잡코리아", "title": "임베디드 펌웨어 개발", "company": "㈜라이온로보틱스", "duty": "대전 유성구 외 1 / 기계·기계설비, 하드웨어개발자", "deadline": null, "salary": "합격축하금 50만원", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49749374", "extra": {"gino": "49749374", "matched_keyword": "펌웨어", "badge": "합격축하금 50만원", "chips": ["대전 유성구 외 1", "기계·기계설비, 하드웨어개발자"]}}, {"id": "jobkorea_49524929", "platform": "잡코리아", "title": "Firmware Engineer", "company": "㈜에니아이", "duty": "서울 성동구 / 기계·기계설비, 하드웨어개발자", "deadline": null, "salary": "경력10년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 8, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49524929", "extra": {"gino": "49524929", "matched_keyword": "펌웨어", "badge": "", "chips": ["서울 성동구", "기계·기계설비, 하드웨어개발자"]}}, {"id": "jobkorea_49558400", "platform": "잡코리아", "title": "Firmware 개발자 (경력자,면접비 지원)", "company": "㈜클리어 디스플레이", "duty": "경기 부천시 / 컴퓨터·하드웨어·장비, 시스템엔지니어, 하드웨어개발자", "deadline": null, "salary": "경력3년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 7, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49558400", "extra": {"gino": "49558400", "matched_keyword": "RTOS", "badge": "", "chips": ["경기 부천시", "컴퓨터·하드웨어·장비, 시스템엔지니어, 하드웨어개발자"]}}, {"id": "jobkorea_49485690", "platform": "잡코리아", "title": "L3 보안 스위치 펌웨어 자체 개발 연구소장 및 핵심 연구원 채용", "company": "㈜미래시그널", "duty": "경기 성남시 / 컴퓨터·하드웨어·장비, 시스템엔지니어 / 연봉 4,000~12,000만원", "deadline": null, "salary": "경력5년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 7, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49485690", "extra": {"gino": "49485690", "matched_keyword": "RTOS", "badge": "", "chips": ["경기 성남시", "컴퓨터·하드웨어·장비, 시스템엔지니어", "연봉 4,000~12,000만원"]}}, {"id": "jobkorea_49757617", "platform": "잡코리아", "title": "Robot Embedded Engineer", "company": "플라잎", "duty": "경기 성남시 / 솔루션·SI·CRM·ERP, AI로봇엔지니어", "deadline": null, "salary": "합격축하금 100만원", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 7, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49757617", "extra": {"gino": "49757617", "matched_keyword": "RTOS", "badge": "합격축하금 100만원", "chips": ["경기 성남시", "솔루션·SI·CRM·ERP, AI로봇엔지니어"]}}, {"id": "jobkorea_49749253", "platform": "잡코리아", "title": "임베디드 하드웨어 개발 (MCU)", "company": "㈜라이온로보틱스", "duty": "대전 유성구 외 1 / 기계·기계설비, 하드웨어개발자", "deadline": null, "salary": "합격축하금 50만원", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 7, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49749253", "extra": {"gino": "49749253", "matched_keyword": "MCU", "badge": "합격축하금 50만원", "chips": ["대전 유성구 외 1", "기계·기계설비, 하드웨어개발자"]}}, {"id": "jobkorea_49621145", "platform": "잡코리아", "title": "기업부설연구소 MCU embedded programing 인재 채용", "company": "에이아이코리아", "duty": "경기 용인시 / 반도체·디스플레이·광학, 소프트웨어개발자", "deadline": null, "salary": "경력5년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 7, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49621145", "extra": {"gino": "49621145", "matched_keyword": "MCU", "badge": "", "chips": ["경기 용인시", "반도체·디스플레이·광학, 소프트웨어개발자"]}}, {"id": "jobkorea_49769195", "platform": "잡코리아", "title": "WBCT팀 정형외과용 CT 펌웨어(FW) 개발", "company": "㈜덴티움", "duty": "경기 수원시 / 제약·보건·바이오, 시스템엔지니어", "deadline": null, "salary": "합격축하금 100만원", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 7, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49769195", "extra": {"gino": "49769195", "matched_keyword": "MCU", "badge": "합격축하금 100만원", "chips": ["경기 수원시", "제약·보건·바이오, 시스템엔지니어"]}}, {"id": "jobkorea_49787023", "platform": "잡코리아", "title": "s/w개발,  s/w설계, firmware개발, 통신개발", "company": "㈜구수 중전기", "duty": "경기 시흥시 / 전기·전자·제어, 전기·전자엔지니어 / 연봉 4,000~6,500만원", "deadline": null, "salary": "경력5년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 7, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49787023", "extra": {"gino": "49787023", "matched_keyword": "MCU", "badge": "", "chips": ["경기 시흥시", "전기·전자·제어, 전기·전자엔지니어", "연봉 4,000~6,500만원"]}}, {"id": "wanted_380385", "platform": "원티드", "title": "기능안전 임베디드 엔지니어", "company": "홀리데이로보틱스", "duty": "임베디드/C++ 개발", "deadline": null, "salary": "경력 5~15년", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380385", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 5~15년", "status": "active"}}, {"id": "wanted_380093", "platform": "원티드", "title": "임베디드 개발자 (시니어)", "company": "위즈코어", "duty": "임베디드/C++ 개발", "deadline": "2026-09-30 23:59:59", "salary": "경력 7~15년", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/380093", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 7~15년", "status": "active"}}, {"id": "wanted_379065", "platform": "원티드", "title": "엔드포인트 보안 소프트웨어 개발자 (C++기반)", "company": "소만사", "duty": "임베디드/C++ 개발", "deadline": "2026-08-31 23:59:59", "salary": "경력 1~9년", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/379065", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 1~9년", "status": "active"}}, {"id": "wanted_379029", "platform": "원티드", "title": "시니어 임베디드 소프트웨어 개발자 10년이상", "company": "퀀텀에어로", "duty": "임베디드/C++ 개발", "deadline": "2026-08-25 23:59:59", "salary": "경력 10~100년", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.wanted.co.kr/wd/379029", "extra": {"reward": "100만원", "industry": "IT, 컨텐츠", "career": "경력 10~100년", "status": "active"}}, {"id": "jobkorea_49727797", "platform": "잡코리아", "title": "임베디드 Linux/RFSoC제어 소프트웨어 엔지니어 채용 공고", "company": "㈜케이이알", "duty": "세종 / 전기·전자·제어, 전기·전자엔지니어, 설계엔지니어, R&D·연구원", "deadline": null, "salary": "경력무관", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49727797", "extra": {"gino": "49727797", "matched_keyword": "임베디드 리눅스", "badge": "", "chips": ["세종", "전기·전자·제어, 전기·전자엔지니어, 설계엔지니어, R&D·연구원"]}}, {"id": "jobkorea_49575202", "platform": "잡코리아", "title": "FAE - MCU/MPU분야", "company": "누보톤테크놀로지 코리아(유)", "duty": "서울 강남구 / 반도체·디스플레이·광학, 필드엔지니어", "deadline": null, "salary": "경력5년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 6, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49575202", "extra": {"gino": "49575202", "matched_keyword": "MCU", "badge": "", "chips": ["서울 강남구", "반도체·디스플레이·광학, 필드엔지니어"]}}, {"id": "jobkorea_49761637", "platform": "잡코리아", "title": "SW직군 상시채용 인재풀 등록 - 임베디드 엔지니어(DSP)", "company": "파크시스템스㈜", "duty": "경기 수원시 / 반도체·디스플레이·광학, 소프트웨어개발자", "deadline": null, "salary": "경력", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 5, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49761637", "extra": {"gino": "49761637", "matched_keyword": "임베디드", "badge": "", "chips": ["경기 수원시", "반도체·디스플레이·광학, 소프트웨어개발자"]}}, {"id": "jobkorea_49721840", "platform": "잡코리아", "title": "휴머노이드 로봇 제어 엔지니어", "company": "㈜위로보틱스", "duty": "서울 송파구 / 기계·기계설비, 전기·전자엔지니어", "deadline": null, "salary": "합격축하금 50만원", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 5, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49721840", "extra": {"gino": "49721840", "matched_keyword": "RTOS", "badge": "합격축하금 50만원", "chips": ["서울 송파구", "기계·기계설비, 전기·전자엔지니어"]}}, {"id": "jobkorea_49645868", "platform": "잡코리아", "title": "[채용/신입&경력직] 임베디드 리눅스 (IP CAMERA )개발자 모십니다.", "company": "㈜피엔에이", "duty": "경기 수원시 / 전기·전자·제어, 전기·전자엔지니어, R&D·연구원 / 연봉 4,000만원~", "deadline": null, "salary": "인턴 채용 진행중", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 5, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49645868", "extra": {"gino": "49645868", "matched_keyword": "임베디드 리눅스", "badge": "인턴 채용 진행중", "chips": ["경기 수원시", "전기·전자·제어, 전기·전자엔지니어, R&D·연구원", "연봉 4,000만원~"]}}, {"id": "jobkorea_49788463", "platform": "잡코리아", "title": "임베디드 리눅스 소프트웨어 개발자 채용", "company": "㈜GES", "duty": "경기 성남시 외 14 / 네트워크·통신서비스, 소프트웨어개발자 / 연봉 6,000만원~", "deadline": null, "salary": "경력10년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 5, "fit_level": "High", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49788463", "extra": {"gino": "49788463", "matched_keyword": "임베디드 리눅스", "badge": "", "chips": ["경기 성남시 외 14", "네트워크·통신서비스, 소프트웨어개발자", "연봉 6,000만원~"]}}, {"id": "jobkorea_49768283", "platform": "잡코리아", "title": "임베디드 시스템개발 엔지니어", "company": "㈜라이온로보틱스", "duty": "대전 유성구 외 1 / 기계·기계설비, 하드웨어엔지니어", "deadline": null, "salary": "합격축하금 50만원", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49768283", "extra": {"gino": "49768283", "matched_keyword": "임베디드", "badge": "합격축하금 50만원", "chips": ["대전 유성구 외 1", "기계·기계설비, 하드웨어엔지니어"]}}, {"id": "jobkorea_49687448", "platform": "잡코리아", "title": "(주)에이치오피 임베디드 개발자 채용", "company": "㈜에이치오피", "duty": "경기 성남시 / 전기·전자·제어, 하드웨어엔지니어 / 연봉 3,600만원~", "deadline": null, "salary": "유연근무제 시행중", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49687448", "extra": {"gino": "49687448", "matched_keyword": "임베디드", "badge": "유연근무제 시행중", "chips": ["경기 성남시", "전기·전자·제어, 하드웨어엔지니어", "연봉 3,600만원~"]}}, {"id": "jobkorea_49411792", "platform": "잡코리아", "title": "스마트홈  IoT 임베디드 개발자 채용", "company": "㈜와츠매터(Whats Matter)", "duty": "경기 수원시 / 쇼핑몰·오픈마켓·소셜커머스, 하드웨어엔지니어", "deadline": null, "salary": "유연근무제 시행중", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49411792", "extra": {"gino": "49411792", "matched_keyword": "임베디드", "badge": "유연근무제 시행중", "chips": ["경기 수원시", "쇼핑몰·오픈마켓·소셜커머스, 하드웨어엔지니어"]}}, {"id": "jobkorea_49445015", "platform": "잡코리아", "title": "PLC, 임베디드시스템 개발인재 모집(Senior Engineer 환영)", "company": "㈜제이에프컨트롤", "duty": "경기 수원시 / 전기·전자·제어, 하드웨어엔지니어", "deadline": null, "salary": "경력15년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49445015", "extra": {"gino": "49445015", "matched_keyword": "임베디드", "badge": "", "chips": ["경기 수원시", "전기·전자·제어, 하드웨어엔지니어"]}}, {"id": "jobkorea_49690913", "platform": "잡코리아", "title": "임베디드 개발자 팀장급 채용", "company": "㈜제이엠로보틱스", "duty": "서울 마포구 / 컴퓨터·하드웨어·장비, 기계엔지니어, 설계엔지니어, 하드웨어엔지니어", "deadline": null, "salary": "경력5년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49690913", "extra": {"gino": "49690913", "matched_keyword": "임베디드", "badge": "", "chips": ["서울 마포구", "컴퓨터·하드웨어·장비, 기계엔지니어, 설계엔지니어, 하드웨어엔지니어"]}}, {"id": "jobkorea_49543346", "platform": "잡코리아", "title": "임베디드 분야 자동제어 소프트웨어 개발 인력 채용", "company": "(주)한백전자", "duty": "대전 유성구 / 전기·전자·제어, 시스템엔지니어, 소프트웨어개발자, AI/ML엔지니어", "deadline": null, "salary": "신입 지원 가능", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49543346", "extra": {"gino": "49543346", "matched_keyword": "임베디드", "badge": "신입 지원 가능", "chips": ["대전 유성구", "전기·전자·제어, 시스템엔지니어, 소프트웨어개발자, AI/ML엔지니어"]}}, {"id": "jobkorea_49749471", "platform": "잡코리아", "title": "임베디드 PC 하드웨어 개발", "company": "㈜라이온로보틱스", "duty": "대전 유성구 외 1 / 기계·기계설비, 하드웨어엔지니어", "deadline": null, "salary": "합격축하금 50만원", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49749471", "extra": {"gino": "49749471", "matched_keyword": "임베디드", "badge": "합격축하금 50만원", "chips": ["대전 유성구 외 1", "기계·기계설비, 하드웨어엔지니어"]}}, {"id": "jobkorea_49649703", "platform": "잡코리아", "title": "Micom 펌웨어 개발", "company": "㈜텔레웍스", "duty": "대전 유성구 / 전기·전자·제어, 시스템엔지니어, 전기·전자엔지니어", "deadline": null, "salary": "신입 지원 가능", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49649703", "extra": {"gino": "49649703", "matched_keyword": "펌웨어", "badge": "신입 지원 가능", "chips": ["대전 유성구", "전기·전자·제어, 시스템엔지니어, 전기·전자엔지니어"]}}, {"id": "jobkorea_49626393", "platform": "잡코리아", "title": "하이젠알앤엠(주) EV 인버터 펌웨어 개발 경력", "company": "하이젠알앤엠㈜", "duty": "경남 창원시 / 기계·기계설비, 전기·전자엔지니어", "deadline": null, "salary": "경력3년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49626393", "extra": {"gino": "49626393", "matched_keyword": "펌웨어", "badge": "", "chips": ["경남 창원시", "기계·기계설비, 전기·전자엔지니어"]}}, {"id": "jobkorea_49691742", "platform": "잡코리아", "title": "[가산디지털단지] 의료기기 펌웨어 개발 담당자 채용", "company": "㈜라디안큐바이오", "duty": "서울 금천구 / 전기·전자·제어, 하드웨어개발자", "deadline": null, "salary": "경력무관", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49691742", "extra": {"gino": "49691742", "matched_keyword": "펌웨어", "badge": "", "chips": ["서울 금천구", "전기·전자·제어, 하드웨어개발자"]}}, {"id": "jobkorea_49581222", "platform": "잡코리아", "title": "펌웨어 엔지니어 채용", "company": "㈜유니아나", "duty": "경기 수원시 / 포털·컨텐츠·커뮤니티, 하드웨어개발자 / 연봉 4,200~7,000만원", "deadline": null, "salary": "경력3년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49581222", "extra": {"gino": "49581222", "matched_keyword": "펌웨어", "badge": "", "chips": ["경기 수원시", "포털·컨텐츠·커뮤니티, 하드웨어개발자", "연봉 4,200~7,000만원"]}}, {"id": "jobkorea_49746256", "platform": "잡코리아", "title": "펌웨어 엔지니어(선임급) 경력 모집", "company": "㈜라뮤", "duty": "경기 군포시 / 전기·전자·제어, 전기·전자엔지니어", "deadline": null, "salary": "경력1년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49746256", "extra": {"gino": "49746256", "matched_keyword": "펌웨어", "badge": "", "chips": ["경기 군포시", "전기·전자·제어, 전기·전자엔지니어"]}}, {"id": "jobkorea_49454216", "platform": "잡코리아", "title": "기술연구소  펌웨어 개발자 모집", "company": "㈜케이티앤씨", "duty": "서울 강서구 / 전기·전자·제어, 시스템엔지니어", "deadline": null, "salary": "경력", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49454216", "extra": {"gino": "49454216", "matched_keyword": "펌웨어", "badge": "", "chips": ["서울 강서구", "전기·전자·제어, 시스템엔지니어"]}}, {"id": "jasoseol_105665_426205", "platform": "자소설닷컴", "title": "[경력] 반도체 장비 제어 SW 개발자 모집(동탄) - 경력-제어기술팀-PC제어(자동화 part)-경기도 화성시(동탄IX타워)", "company": "케이씨텍", "duty": "경력-제어기술팀-PC제어(자동화 part)-경기도 화성시(동탄IX타워)", "deadline": "2026-08-23 23:59:00", "salary": "", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://jasoseol.com/recruit/105665", "extra": {"company_id": 105665, "employment_id": 426205, "field": "경력-제어기술팀-PC제어(자동화 part)-경기도 화성시(동탄IX타워)", "group_name": "케이씨텍"}}, {"id": "jasoseol_105567_425885", "platform": "자소설닷컴", "title": "2026 FADU Junior Talent 채용 - Firmware Engineer", "company": "파두", "duty": "Firmware Engineer", "deadline": "2026-08-23 23:59:00", "salary": "", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 4, "fit_level": "Med", "is_highlighted": false, "url": "https://jasoseol.com/recruit/105567", "extra": {"company_id": 105567, "employment_id": 425885, "field": "Firmware Engineer", "group_name": "파두"}}, {"id": "jobkorea_49789608", "platform": "잡코리아", "title": "PCB,전자회로,하드웨어 개발,orcad,mcu,micom 개발 경력 모십니다.", "company": "크레탐㈜", "duty": "경기 안양시 / 전기·전자·제어, 전기·전자엔지니어, R&D·연구원", "deadline": null, "salary": "경력10년↑", "company_type": "중소/스타트업", "company_type_code": 4, "fit_score": 3, "fit_level": "Med", "is_highlighted": false, "url": "https://www.jobkorea.co.kr/Recruit/GI_Read/49789608", "extra": {"gino": "49789608", "matched_keyword": "MCU", "badge": "", "chips": ["경기 안양시", "전기·전자·제어, 전기·전자엔지니어, R&D·연구원"]}}];
+
+        let currentPlatform = 'all';
+        let currentSearch = '';
+        let currentSort = 'recommend';
+        let selectedKeyword = '';
+        let bookmarks = JSON.parse(localStorage.getItem('job_radar_bookmarks') || '[]');
+
+        function updateBookmarkCount() {
+            const el = document.getElementById('bookmarkCount');
+            if (el) el.textContent = bookmarks.length;
+        }
+
+        function toggleBookmark(jobId) {
+            const index = bookmarks.indexOf(jobId);
+            if (index === -1) {
+                bookmarks.push(jobId);
+            } else {
+                bookmarks.splice(index, 1);
+            }
+            localStorage.setItem('job_radar_bookmarks', JSON.stringify(bookmarks));
+            updateBookmarkCount();
+            renderJobs();
+        }
+
+        function formatDeadline(deadlineStr) {
+            if (!deadlineStr) {
+                return { label: '상시 채용', badgeClass: 'deadline-normal', days: 9999 };
+            }
+            try {
+                const targetDate = new Date(deadlineStr.replace(/-/g, '/'));
+                const now = new Date();
+                const diffTime = targetDate - now;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                const month = (targetDate.getMonth() + 1).toString().padStart(2, '0');
+                const day = targetDate.getDate().toString().padStart(2, '0');
+                const dateText = `${month}/${day}`;
+
+                if (diffDays < 0) {
+                    return { label: '마감됨', badgeClass: 'deadline-normal', days: -1 };
+                } else if (diffDays === 0) {
+                    return { label: '🔥 오늘 마감', badgeClass: 'deadline-urgent', days: 0 };
+                } else if (diffDays <= 3) {
+                    return { label: `🚨 D-${diffDays} (~${dateText})`, badgeClass: 'deadline-urgent', days: diffDays };
+                } else if (diffDays <= 7) {
+                    return { label: `⏳ D-${diffDays} (~${dateText})`, badgeClass: 'deadline-warning', days: diffDays };
+                } else {
+                    return { label: `~${dateText} (D-${diffDays})`, badgeClass: 'deadline-normal', days: diffDays };
+                }
+            } catch (e) {
+                return { label: deadlineStr.substring(0, 10), badgeClass: 'deadline-normal', days: 999 };
+            }
+        }
+
+        function getPlatformBadgeClass(platform) {
+            if (platform === '원티드') return 'platform-wanted';
+            if (platform === '잡코리아') return 'platform-jobkorea';
+            if (platform === '자소설닷컴') return 'platform-jasoseol';
+            return '';
+        }
+
+        function renderJobs() {
+            const grid = document.getElementById('jobGrid');
+            const matchCountEl = document.getElementById('matchCount');
+            
+            // 필터링
+            let filtered = rawJobs.filter(job => {
+                // 북마크 필터
+                if (currentPlatform === 'bookmarked') {
+                    if (!bookmarks.includes(job.job_id || job.id)) return false;
+                } else if (currentPlatform === 'highlight') {
+                    if (!job.is_highlighted && job.company_type_code !== 1) return false;
+                } else if (currentPlatform !== 'all') {
+                    if (job.platform !== currentPlatform) return false;
+                }
+
+                // 키워드 칩 필터
+                if (selectedKeyword) {
+                    const kw = selectedKeyword.toLowerCase();
+                    const combined = (job.company + ' ' + job.title + ' ' + (job.duty || '') + ' ' + (job.company_type || '')).toLowerCase();
+                    if (!combined.includes(kw)) return false;
+                }
+
+                // 검색어 필터
+                if (currentSearch.trim()) {
+                    const q = currentSearch.trim().toLowerCase();
+                    const combined = (job.company + ' ' + job.title + ' ' + (job.duty || '') + ' ' + (job.company_type || '')).toLowerCase();
+                    if (!combined.includes(q)) return false;
+                }
+
+                return true;
+            });
+
+            // 정렬
+            filtered.sort((a, b) => {
+                if (currentSort === 'deadline') {
+                    const dlA = formatDeadline(a.deadline).days;
+                    const dlB = formatDeadline(b.deadline).days;
+                    return dlA - dlB;
+                } else if (currentSort === 'fit') {
+                    return (b.fit_score || 0) - (a.fit_score || 0);
+                } else if (currentSort === 'latest') {
+                    return (b.sent_at || '').localeCompare(a.sent_at || '');
+                } else {
+                    // 기본 추천순: 하이라이트 > 기업규모 > 적합도
+                    if ((b.is_highlighted ? 1 : 0) !== (a.is_highlighted ? 1 : 0)) {
+                        return (b.is_highlighted ? 1 : 0) - (a.is_highlighted ? 1 : 0);
+                    }
+                    if ((a.company_type_code || 4) !== (b.company_type_code || 4)) {
+                        return (a.company_type_code || 4) - (b.company_type_code || 4);
+                    }
+                    return (b.fit_score || 0) - (a.fit_score || 0);
+                }
+            });
+
+            matchCountEl.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🔎</div>
+                        <h3>조건에 일치하는 공고가 없습니다</h3>
+                        <p>검색어나 필터 조건을 변경하여 다시 확인해보세요.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(job => {
+                const jobId = job.job_id || job.id;
+                const isBookmarked = bookmarks.includes(jobId);
+                const isHighlight = job.is_highlighted || job.company_type_code === 1;
+                const dl = formatDeadline(job.deadline);
+                const platformClass = getPlatformBadgeClass(job.platform);
+                
+                let fitBadgeClass = 'fit-low';
+                if (job.fit_level === 'High') fitBadgeClass = 'fit-high';
+                else if (job.fit_level === 'Med') fitBadgeClass = 'fit-med';
+
+                // 세부 직무 칩 파싱
+                let dutyHtml = '';
+                if (job.duty) {
+                    const chips = job.duty.split(/[,·/]/).map(s => s.trim()).filter(s => s.length > 0).slice(0, 4);
+                    if (chips.length > 0) {
+                        dutyHtml = `<div class="duty-chips">${chips.map(c => `<span class="duty-chip">${c}</span>`).join('')}</div>`;
+                    }
+                }
+
+                return `
+                    <article class="job-card ${isHighlight ? 'is-highlight' : ''}" id="card-${jobId}">
+                        <div>
+                            <div class="job-card-top">
+                                <div class="company-info">
+                                    <span class="company-name">${job.company || '기업명 미제공'}</span>
+                                    <span class="badge badge-platform ${platformClass}">${job.platform}</span>
+                                    ${job.is_highlighted ? '<span class="badge badge-highlight">⭐ 하이라이트</span>' : ''}
+                                    ${job.company_type === '대기업' ? '<span class="badge badge-type-1">대기업</span>' : (job.company_type === '중견기업' ? '<span class="badge badge-type-2">중견</span>' : '')}
+                                </div>
+                            </div>
+
+                            <a href="${job.url}" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                                <h2 class="job-title" title="${job.title}">${job.title}</h2>
+                            </a>
+
+                            <div class="job-details">
+                                <div class="detail-row">
+                                    <span class="detail-icon">⏰</span>
+                                    <span class="deadline-badge ${dl.badgeClass}">${dl.label}</span>
+                                    <span style="font-size: 11px; color: var(--text-subtle); margin-left: auto;">
+                                        적합도 <span class="fit-pill ${fitBadgeClass}">${job.fit_level} (+${job.fit_score || 0})</span>
+                                    </span>
+                                </div>
+                                ${job.salary ? `<div class="detail-row"><span class="detail-icon">💼</span><span>${job.salary}</span></div>` : ''}
+                            </div>
+
+                            ${dutyHtml}
+                        </div>
+
+                        <div class="card-actions">
+                            <button class="btn-bookmark ${isBookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark('${jobId}')" title="관심 공고 저장">
+                                ${isBookmarked ? '★' : '☆'}
+                            </button>
+                            <a href="${job.url}" target="_blank" rel="noopener noreferrer" class="btn-link">
+                                원문 공고 바로가기 ↗
+                            </a>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            updateBookmarkCount();
+            renderJobs();
+
+            // 검색 인풋
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                currentSearch = e.target.value;
+                renderJobs();
+            });
+
+            // 플랫폼 탭
+            const platformTabs = document.getElementById('platformTabs');
+            platformTabs.addEventListener('click', (e) => {
+                const btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPlatform = btn.dataset.platform;
+                renderJobs();
+            });
+
+            // 정렬 셀렉트
+            const sortSelect = document.getElementById('sortSelect');
+            sortSelect.addEventListener('change', (e) => {
+                currentSort = e.target.value;
+                renderJobs();
+            });
+
+            // 빠른 키워드 칩
+            document.querySelectorAll('.keyword-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    const kw = chip.dataset.keyword;
+                    if (selectedKeyword === kw) {
+                        selectedKeyword = '';
+                        chip.classList.remove('active');
+                    } else {
+                        document.querySelectorAll('.keyword-chip').forEach(c => c.classList.remove('active'));
+                        selectedKeyword = kw;
+                        chip.classList.add('active');
+                    }
+                    renderJobs();
+                });
+            });
+
+            // Scroll to Top
+            const btnTop = document.getElementById('btnTop');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    btnTop.classList.add('visible');
+                } else {
+                    btnTop.classList.remove('visible');
+                }
+            });
+            btnTop.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>

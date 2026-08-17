@@ -1,0 +1,40 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Virtual Environments
+venv/
+env/
+vkent/
+test_env/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables & Secret credentials (CRITICAL for Public Repos)
+.env
+.env.local
+.env.*.local
+kakao_tokens.json
+src/kakao_tokens.json
+*.pem
+*.key
+
+# Local SQLite databases (tracked separately or dynamic)
+*.db
+*.sqlite
+*.sqlite3
+src/jobs.db
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# OS / Scratch
+scratch/
