@@ -91,9 +91,10 @@ python src/main.py
 ## 🤖 GitHub Actions & Pages 배포 설정
 
 ### 1. GitHub Repository Secrets 등록
-GitHub 저장소의 **[Settings] -> [Secrets and variables] -> [Actions]** 에서 `New repository secret`을 클릭하여 2개의 시크릿을 등록합니다:
+GitHub 저장소의 **[Settings] -> [Secrets and variables] -> [Actions]** 에서 `New repository secret`을 클릭하여 아래 시크릿들을 등록합니다:
 - `KAKAO_REST_API_KEY`: 본인의 카카오 REST API 키
-- `KAKAO_REFRESH_TOKEN`: 발급받은 Refresh Token
+- `KAKAO_CLIENT_SECRET`: 카카오 Client Secret (보안 코드가 활성화된 경우)
+- `KAKAO_REFRESH_TOKEN`: 발급받은 카카오 Refresh Token
 
 ### 2. GitHub Pages 활성화
 1. 저장소 **[Settings] -> [Pages]** 이동
